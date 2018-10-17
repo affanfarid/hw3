@@ -36,7 +36,7 @@ void forkChild(char *args[], int n){
         char* firstArgs[i+1];
         char* secondArgs[argsLength - i];
          
-        firstArgs[i] == '/0';
+        firstArgs[i] = '/0';
         for(int j = 0; j < i; j++){
             firstArgs[j] = args[j];
         }
@@ -75,10 +75,10 @@ void forkChild(char *args[], int n){
     
     exit(0);
   }else{
-    printf("pid: %d\n", getpid());
-    printf("status: %d\n", &status);
+    printf("pid:%d", getpid());
+    printf("status:%d", &status);
     wait(&status);
-    printf("exit: %d\n", status);
+    printf("\nexit: %d\n", status);
   }
 }
 
