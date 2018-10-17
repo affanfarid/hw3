@@ -125,7 +125,7 @@ int main(int argc, char **argv) {
     args[i] = (char *)0;
 
     forkChild(args, i);
-    freeStuff(args, i);
+    //freeStuff(args, i);
 
   }
   return 0;
