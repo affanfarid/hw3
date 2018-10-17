@@ -42,7 +42,7 @@ void forkChild(char *args[], int n){
         }
         
         for(int k = i+1; k< argsLength; k++){
-            secondArgs[] = args[k];
+            secondArgs[k-(i+1)] = args[k];
         }
         //create new array
           
