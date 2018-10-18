@@ -31,21 +31,21 @@ void forkChild(char *args[], int n){
     for(i = 0; i < n; i++){
       if(strncmp(args[i], ";", 2) == 0){
         
-//        
+//
 //        int argsLength = sizeof(args) / sizeof(char*);
 //        char* firstArgs[i+1];
 //        char* secondArgs[argsLength - i];
-//         
+//
 //        firstArgs[i] == '/0';
 //        for(int j = 0; j < i; j++){
 //            firstArgs[j] = args[j];
 //        }
-//        
+//
 //        for(int k = i+1; k< argsLength; k++){
 //            secondArgs[k-(i+1)] = args[k];
 //        }
 //        //create new array
-//          
+//
 //        execvp(firstArgs[0],firstArgs);
 //        execvp(secondArgs[0],secondArgs);
           
@@ -76,7 +76,7 @@ void forkChild(char *args[], int n){
     exit(0);
   }else{
     printf("pid:%d", getpid());
-    printf("status:%d", &status);
+    //printf("status:%d", &status);
     wait(&status);
     printf("exit: %d\n", status);
   }
