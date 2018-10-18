@@ -8,14 +8,52 @@
 #include <unistd.h>
 
 
+void twoArgsHandler(char *args[], int i){
+    int argsLength = sizeof(args) / sizeof(char*);
+    char* firstArgs[i+1];
+    char* secondArgs[argsLength - i];
+    
+    firstArgs[i] = "/0";
+    for(int j = 0; j < i; j++){
+        firstArgs[j] = args[j];
+    }
+    
+    for(int k = i+1; k< argsLength; k++){
+        secondArgs[k-(i+1)] = args[k];
+    }
+    //create new array
+    
+    execvp(firstArgs[0],firstArgs);
+    execvp(secondArgs[0],secondArgs);
+}
+
+void redirectOutputHandler(char *args[], int i, int fd){
+    args[i] = (char *) 0;
+    fd = open(args[i + 1], O_RDWR|O_CREAT, S_IWUSR|S_IRGRP| S_IROTH);
+    dup2(fd, 1);
+    close(fd);
+    execvp(args[0], args);
+
+}
+
+void redirectInputHandler(char *args[], int i, int fd){
+    args[i] = (char *) 0;
+    fd = open(args[i+1], O_RDONLY);
+    dup2(fd, 0);
+    close(fd);
+    execvp(args[0], args);
+}
+
+
+
 void sigint_handler(int sig){
     write(1, "caught signal: sigint\nCS361 >", sizeof("caught signal: sigint\nCS361 >"));
-    exit(0);
+    //exit(0);
     return;
 }
 void sigtstp_handler(int sig){
     write(1, "caught signal: sigstp\nCS361 >", sizeof("caught signal: sigstp\nCS361 >"));
-    exit(0);
+    //exit(0);
     return;
 }
 void forkChild(char *args[], int n){
@@ -29,60 +67,63 @@ void forkChild(char *args[], int n){
         for(i = 0; i < n; i++){
             if(strncmp(args[i], ";", 2) == 0){
                 
-                
-                int argsLength = sizeof(args) / sizeof(char*);
-                char* firstArgs[i+1];
-                char* secondArgs[argsLength - i];
-                
-                firstArgs[i] = '/0';
-                for(int j = 0; j < i; j++){
-                    firstArgs[j] = args[j];
-                }
-                
-                for(int k = i+1; k< argsLength; k++){
-                    secondArgs[k-(i+1)] = args[k];
-                }
-                //create new array
-                
-                execvp(firstArgs[0],firstArgs);
-                execvp(secondArgs[0],secondArgs);
+                twoArgsHandler(args,i);
+//                int argsLength = sizeof(args) / sizeof(char*);
+//                char* firstArgs[i+1];
+//                char* secondArgs[argsLength - i];
+//
+//                firstArgs[i] = "/0";
+//                for(int j = 0; j < i; j++){
+//                    firstArgs[j] = args[j];
+//                }
+//
+//                for(int k = i+1; k< argsLength; k++){
+//                    secondArgs[k-(i+1)] = args[k];
+//                }
+//                //create new array
+//
+//                execvp(firstArgs[0],firstArgs);
+//                execvp(secondArgs[0],secondArgs);
                 
                 break;
             }else if(strncmp(args[i], ">", 1) == 0){
                 flag = 1;
-                args[i] = (char *) 0;
-                fd = open(args[i + 1], O_RDWR|O_CREAT, S_IWUSR|S_IRGRP| S_IROTH);
-                dup2(fd, 1);
-                close(fd);
-                execvp(args[0], args);
+                redirectOutputHandler(args,i,fd);
+//                args[i] = (char *) 0;
+//                fd = open(args[i + 1], O_RDWR|O_CREAT, S_IWUSR|S_IRGRP| S_IROTH);
+//                dup2(fd, 1);
+//                close(fd);
+//                execvp(args[0], args);
                 break;
             }else if(strncmp(args[i], "<", 1) == 0){
                 flag = 1;
-                args[i] = (char *) 0;
-                fd = open(args[i+1], O_RDONLY);
-                dup2(fd, 0);
-                close(fd);
-                execvp(args[0], args);
+                redirectInputHandler(args,i,fd);
+//                args[i] = (char *) 0;
+//                fd = open(args[i+1], O_RDONLY);
+//                dup2(fd, 0);
+//                close(fd);
+//                execvp(args[0], args);
                 break;
             }
         }
         
         exit(0);
     }else{
-        printf("pid:%d", getpid());
-        printf("status:%d\n", &status);
         wait(&status);
+        printf("pid:%d", pid);
+        printf(" status:%d\n", WEXITSTATUS(status));
+        
         //printf("exit: %d\n", status);
-        printf("exit: %d\n", WEXITSTATUS(status));
+        //printf("exit: %d\n", WEXITSTATUS(status));
     }
 }
-void freeStuff(char **arr, int n){
-    int i;
-    for(i = 0; i < n; i++){
-        free(arr[i]);
-    }
-    free(arr);
-}
+//void freeStuff(char **arr, int n){
+//    int i;
+//    for(i = 0; i < n; i++){
+//        free(arr[i]);
+//    }
+//    free(arr);
+//}
 int main(int argc, char **argv) {
     while (1) {
         
