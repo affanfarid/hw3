@@ -6,12 +6,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+
 void sigint_handler(int sig){
     write(1, "caught signal: sigint\nCS361 >", sizeof("caught signal: sigint\nCS361 >"));
+    exit(0);
     return;
 }
 void sigtstp_handler(int sig){
     write(1, "caught signal: sigstp\nCS361 >", sizeof("caught signal: sigstp\nCS361 >"));
+    exit(0);
     return;
 }
 void forkChild(char *args[], int n){
@@ -30,7 +34,7 @@ void forkChild(char *args[], int n){
                 char* firstArgs[i+1];
                 char* secondArgs[argsLength - i];
                 
-                firstArgs[i] == '/0';
+                firstArgs[i] = '/0';
                 for(int j = 0; j < i; j++){
                     firstArgs[j] = args[j];
                 }
@@ -50,6 +54,7 @@ void forkChild(char *args[], int n){
                 fd = open(args[i + 1], O_RDWR|O_CREAT, S_IWUSR|S_IRGRP| S_IROTH);
                 dup2(fd, 1);
                 close(fd);
+                execvp(args[0], args);
                 break;
             }else if(strncmp(args[i], "<", 1) == 0){
                 flag = 1;
@@ -57,19 +62,18 @@ void forkChild(char *args[], int n){
                 fd = open(args[i+1], O_RDONLY);
                 dup2(fd, 0);
                 close(fd);
+                execvp(args[0], args);
                 break;
             }
-        }
-        if (flag){
-            execvp(args[0], args);
         }
         
         exit(0);
     }else{
-        printf("pid: %d\n", getpid());
-        printf("status: %d\n", &status);
+        printf("pid:%d", getpid());
+        printf("status:%d\n", &status);
         wait(&status);
-        printf("exit: %d\n", status);
+        //printf("exit: %d\n", status);
+        printf("exit: %d\n", WEXITSTATUS(status));
     }
 }
 void freeStuff(char **arr, int n){
@@ -103,7 +107,7 @@ int main(int argc, char **argv) {
         args[i] = (char *) malloc(sizeof(char* )* 100);
         args[i] = (char *)0;
         forkChild(args, i);
-        freeStuff(args, i);
+        //freeStuff(args, i);
     }
     return 0;
 }
